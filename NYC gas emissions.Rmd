@@ -1,0 +1,751 @@
+---
+title: "Assessing the Impact of Greenhouse Gas Emissions on Climate Change in state of New York"
+author: Sridivya Pirisingula  
+date: "May 13, 2024"
+abstract: Climate change poses a significant threat to ecosystems, health, and society at large, primarily driven by greenhouse gases like carbon dioxide (CO2), methane (CH4), and nitrous oxide (N2O). In densely populated urban areas such as New York , extreme weather events underscore the urgent need to understand local greenhouse gas emission`s impact on climate. This study investigates the primary sources of greenhouse gas emissions in NYC over three decades and their correlation with observed temperature variations and extreme weather events. Utilizing comprehensive datasets on emissions and temperature fluctuations from 1990 to 2023, we identify changing trends and patterns crucial for targeted mitigation strategies. Our findings highlight the increasing importance of addressing local emissions to mitigate climate risks.
+output: pdf_document
+tables: true
+header-includes: 
+  - \renewcommand{\and}{\\}
+editor_options: 
+  markdown: 
+    wrap: sentence
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE)
+```
+
+**Introduction**
+
+In New York, the challenges posed by climate change have become increasingly evident, impacting various aspects of our environment and socio-economic landscape.
+Understanding the sources and trends of greenhouse gas emissions is essential for informed climate policy and mitigation strategies.
+
+This research project aims to analyze greenhouse gas emissions data spanning three decades to identify key sources and assess their impact on local climate variables, including temperature fluctuations and extreme weather events.
+Utilizing comprehensive datasets, we seek to investigate the relationships between man made emissions and climatic changes within the region.
+One of the indicators of climate change is the overall increase in temperature, which can precipitate various weather disasters.
+
+By conducting this detailed analysis, our objective is to identify the sources of greenhouse gas emissions and examine trends in temperature and extreme weather events, such as winter storm periods, in New York.
+By providing this information, we aim to contribute to the ongoing efforts to address climate change.
+The findings of this study will serve to inform and guide policymakers and the public, facilitating the development of targeted strategies to reduce emissions and foster a more sustainable and resilient future for the state
+
+**Research Questions:**
+
+In this project, our aim is to investigate:
+
+1-What are the primary economic sectors responsible for greenhouse gas emissions in New York, and how have these emissions changed over time?
+
+2-How do variations in greenhouse gas emissions correlate with observed changes in temperature likely causing extreme weather events in NY?
+
+3-Which greenhouse gases are the most significant or have the highest emission levels?
+
+But why are these questions important to ask?
+well investigating the primary economic sectors driving greenhouse gas emissions in New York City and their trajectory over time holds paramount importance, given the city's global prominence in finance, commerce, and industry.
+Historically, transportation and industry have emerged as leading contributors to emissions, fueled by the city's intricate transit infrastructure, bustling ports, and robust demand for goods and services.
+Understanding the emission dynamics across these sectors is imperative for formulating precise mitigation strategies and evaluating policy effectiveness.
+
+The dataset used in this research reveals that the most significant economic sectors in terms of greenhouse gas emissions, in descending order, include **industry, transportation, buildings, electricity, waste, and agriculture**.
+While New York State isn't typically associated with extensive agriculture, industries and transportation play substantial roles in emissions.
+For instance, industrial activities such as manufacturing processes and transportation modes like freight trucks significantly contribute to emissions.
+Additionally, New York, often known as the "Concrete Jungle," boasts numerous buildings and high-rises, resulting in substantial energy consumption and emissions associated with their maintenance.
+Moreover, the city's dense population generates considerable waste, whether industrial or residential.
+It's noteworthy that each of these sectors encompasses various subcategories, such as residential and commercial, further elucidating the nuances of emissions sources within these sectors.
+
+Understanding the relationship between greenhouse gas emissions and climate impacts in New York is critical due to the city's susceptibility to extreme weather events and rising temperatures.
+Research indicates that human-generated emissions are the primary driver of global warming and are closely linked to changes in weather patterns.
+By analyzing these correlations, policymakers can develop targeted strategies to reduce emissions and build resilience against climate change impacts.
+
+Moreover, pinpointing the most prevalent greenhouse gases like carbon dioxide, methane, and nitrous oxide as mentioned in our dataset, enables prioritized mitigation efforts.
+This understanding paves the way for developing effective methods to reduce or recycle the most significant gases like CO2, that can be contributing to a more sustainable environment.
+
+
+
+**About the data**
+
+The **"Statewide Greenhouse Gas Emissions: Beginning 1990"** dataset provides detailed emission totals used for the New York State Statewide Greenhouse Gas Emissions Report, a key part of the State's strategy to address climate change.
+This inventory meets the requirements of the Climate Leadership and Community Protection Act (CLCPA) and helps track progress in reducing greenhouse gas (GHG) emissions.
+It offers the most up-to-date annual emission estimates from 1990 to the present year.
+This dataset comprises thirteen features, with key variables including:
+
+-   **Economic Sector**: Indicates the industry emitting the gases.
+-   **Category and Subcategories 1-3**:
+    -   **Subcategory 1**: Type of environment/vessel (e.g., residential, industrial, transportation).
+    -   **Subcategory 2**: Context of the emission.
+    -   **Subcategory 3**: Type of fuel used.
+-   **Year**: The year of emission data.
+-   **Gas Type**: Specific greenhouse gas emitted (e.g., CO2, CH4, N2O).
+
+The dataset utilized in this study underwent some alterations prior to the analysis stage which will be discussed.It was sourced from the Data.gov website in CSV (comma-separated-value) format to maintain reproducibility.
+\newpage
+The **"Average Temperature from 1900 to 2023"** dataset presents the average annual temperature (°F) recorded each year from 1900 to 2023.
+The data is derived from observations collected by an extensive network of weather stations throughout the United States.
+This dataset serves as a valuable resource for understanding long-term temperature trends and patterns, aiding research and policy development related to climate change.
+It is sourced in CSV (comma-separated-value) format from the National Centers for Environmental Information (NCEI), a part of the National Oceanic and Atmospheric Administration (NOAA).
+This dataset is consisted of two columns:
+
+**Average Fahrenheit Temperature:** The average annual temperature in degrees Fahrenheit
+
+**year:**The year of temperature data
+
+
+
+**Cleaning and Merging The Data:**
+
+To merge the datasets, we initially loaded two files: the "Statewide Greenhouse Gas Emissions: Beginning 1990" dataset and "Average_Temperature_1900-2023.csv".
+After inspecting their structures and initial rows to ensure compatibility, we proceeded with the merging process.
+Leveraging the common identifier "Year" present in both datasets, we merged them to combine the information while preserving the yearly associations.
+Subsequently, we validated the merged dataset, "merged_data", affirming the success of the merging operation through structural verification and a cursory review of its initial rows.
+This merged dataset now integrates the relevant data from both sources, facilitating comprehensive analysis and insights into the combined information.
+
+After loading and merging the datasets, we applied cleaning procedures to ensure consistency and accuracy in our analysis.
+This involved converting certain variables, such as 'Gross', 'Net', 'Conventional Accounting', 'Sector', 'Category', 'Sub.Category.1', 'Sub.Category.2', 'Sub.Category.3', and 'Gas', into factors.
+This conversion facilitates proper recognition of categorical variables, enhancing the reliability of subsequent analyses.
+
+We applied cleaning procedures to the dataset using the provided code snippet in the Rmd file:
+
+```{r data_cleaning, eval=FALSE, echo=FALSE}
+
+data_1$Gross <- as.factor(data_1$Gross)
+data_1$Net <- as.factor(data_1$Net)
+data_1$Conventional.Accounting <- as.factor(data_1$Conventional.Accounting)
+data_1$Sector <- as.factor(data_1$Sector)
+data_1$Category <- as.factor(data_1$Category)
+data_1$Sub.Category.1 <- as.factor(data_1$Sub.Category.1)
+data_1$Sub.Category.2 <- as.factor(data_1$Sub.Category.2)
+data_1$Sub.Category.3 <- as.factor(data_1$Sub.Category.3)
+data_1$Gas <- as.factor(data_1$Gas)
+```
+
+
+
+
+**Summary of the merged dataset:**
+
+```{r summary_table, results='asis'}
+
+library(knitr)
+
+gas <- read.csv("merged_data.csv")
+
+summary_output <- capture.output(summary(gas))
+
+cat(kable(summary_output, format = "latex", caption = "Summary Statistics"))
+
+```
+
+Here is a brief summery of our merged dataset, table 1 Also offers a persice discription of the dataset.
+
+**Year:** The data spans from 1990 to 2021.
+
+**Gross:** All values are of character type with no statistical summary provided.
+
+**Net:** All values are of character type with no statistical summary provided.
+
+**Conventional.Accounting:** All values are of character type with no statistical summary provided.
+
+**Economic.Sector:** No statistical summary provided.
+
+**Sector:** No statistical summary provided.
+
+**Category:** No statistical summary provided.
+
+**Sub.Category.1:** No statistical summary provided.
+
+**Sub.Category.2:** No statistical summary provided.
+
+**Sub.Category.3:** No statistical summary provided.
+
+**Gas:** No statistical summary provided.
+
+**MT.CO2e.AR5.20.yr:** Summary statistics indicate a wide range of values, from negative to positive, with a minimum of -31,347,571 and a maximum of 59,162,391.
+
+**MT.CO2e.AR4.100.yr:** Summary statistics indicate a wide range of values, from negative to positive, with a minimum of -31,347,571 and a maximum of 59,162,391.
+
+**Average_Fahrenheit_Temperature:** Summary statistics indicate a range of Fahrenheit temperatures, from 50.30 to 55.00, with a mean of 53.61.
+\newpage
+
+**Analysis and Results:**
+
+Now, it's time to analyze our dataset and enhance our understanding through visualization.
+Through these visualizations and analyses, we aim to find answers to two of our questions and build the grounds for our second question:
+
+What are the primary economic sectors responsible for greenhouse gas emissions in New York, and how have these emissions changed over time?
+Which greenhouse gases are the most significant or have the highest emission levels?
+
+
+
+```{r}
+library(ggplot2)
+
+#setwd("C:/Users/reyha/Desktop/IDS Project")
+gas <- read.csv("merged_data.csv")
+
+# Count the frequency of each Economic Sector
+sector_counts <- table(gas$Economic.Sector)
+
+# Convert the counts to a data frame
+sector_df <- as.data.frame(sector_counts)
+
+# Rename the columns for clarity
+colnames(sector_df) <- c("Economic.Sector", "Count")
+
+# Calculate the percentage of each sector
+sector_df$Percentage <- sector_df$Count / sum(sector_df$Count) * 100
+
+# Create the pie chart
+pie_chart <- ggplot(sector_df, aes(x = "", y = Count, fill = Economic.Sector)) +
+  geom_bar(stat = "identity") +
+  coord_polar("y", start = 0) +  # Convert to polar coordinates
+  labs(title = "Figure 1:Distribution of Economic Sectors") +
+  scale_fill_brewer(palette = "Set2") +  # Choose a color palette
+  theme_void() +  # Remove axis and grid lines
+  geom_text(aes(label = paste0(round(Percentage), "%")), position = position_stack(vjust = 0.5))  # Add percentage labels
+
+# Print the pie chart
+print(pie_chart)
+
+
+
+```
+
+Figure 1 illustrates the distribution of greenhouse gas emissions across various economic sectors.
+Notably, industry holds the largest share, accounting for 36% of total emissions.
+This significant contribution primarily stems from methane emissions originating from large factories, highlighting the industrial sector's substantial environmental impact.
+Transportation, as expected in New York, follows closely behind, comprising 25% of emissions, primarily attributed to CO2 emissions resulting from fossil fuel combustion.
+Additionally, the electricity sector represents 13% of emissions, reflecting energy consumption patterns in New York.
+Agriculture and waste sectors contribute 1% and 6% respectively.
+Understanding which sectors emit the most greenhouse gases allows us to pinpoint them in our analysis and subsequently analyze which gases are predominantly emitted within each sector.
+
+\newpage
+
+
+
+
+```{r}
+# Load necessary packages
+library(dplyr)
+library(ggplot2)
+
+# Calculate total emissions for each greenhouse gas
+gas_emissions <- gas %>%
+  group_by(Gas) %>%
+  summarize(Total_Emissions = sum(MT.CO2e.AR5.20.yr))
+
+# Plot
+ggplot(gas_emissions, aes(x = Gas, y = Total_Emissions)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Figure 2: Total Emissions per Greenhouse Gas",
+       x = "Greenhouse Gas",
+       y = "Total Emissions (MT.CO2e.AR5.20.yr)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+Figure 2 illustrates the total emissions of different greenhouse gases, measured in metric tons of CO2 equivalent.
+The most prominent emissions come from CO2 (carbon dioxide) and CH4 (methane) , while other gases such as HFCs (hydrofluorocarbons) and N20 (nitrous oxide) also contribute.
+Biogenic CO2, NF3 (nitrogen trifluoride), PFCs (perfluorocarbons), and SF6 (sulfur hexafluoride) have negligible or zero emissions.
+This is important because now we can pinpoint which gas has the highest emission which is CO2 as observed here, and analyze if it has any correlation with the categories in Figure 5.
+We will inspect this closely.
+
+\newpage
+
+```{r}
+library(dplyr)
+library(ggplot2)
+
+# Group the data by Economic Sector and Gas, and calculate the total emissions
+sector_gas <- aggregate(MT.CO2e.AR5.20.yr ~ Economic.Sector + Gas, data = gas, FUN = sum)
+
+# Order the Economic Sectors by total emissions
+sector_order <- sector_gas %>%
+  group_by(Economic.Sector) %>%
+  summarise(Total_Emissions = sum(MT.CO2e.AR5.20.yr)) %>%
+  arrange(desc(Total_Emissions)) %>%
+  pull(Economic.Sector)
+
+# Convert the Economic Sector factor to ordered factor
+gas$Economic.Sector <- factor(gas$Economic.Sector, levels = sector_order)
+
+# Create the stacked bar plot
+stacked_bar <- ggplot(gas, aes(x = Economic.Sector, y = MT.CO2e.AR5.20.yr, fill = Gas)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Figure 3: Emissions by Economic Sector and Gas",
+       x = "Economic Sector",
+       y = "Total Emissions (MT.CO2e.AR5.20.yr)",
+       fill = "Gas") +
+  scale_fill_brewer(palette = "Set2") +  # Choose a color palette
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "bottom") +  # Rotate x-axis labels for better readability
+  scale_y_continuous(labels = scales::comma)  # Format y-axis labels as numeric with commas
+
+# Print the stacked bar plot
+print(stacked_bar)
+
+```
+
+Figure 3 illustrates emissions by different economic sectors and types of gases.
+The Building sector stands out as the largest emitter, with emissions predominantly composed of CO2 (carbon dioxide) and biogenic CO2.
+Following closely, the Transportation sector also makes a significant contribution to emissions.
+While sectors like electricity, industry, and waste also play roles, Agriculture's contribution is minimal in New York due to its urban nature.
+Interestingly, Net Emissions exhibit negative values, indicating absorption or offsetting of gases emitted by other sectors.
+
+\newpage
+
+```{r}
+library(ggplot2)
+#setwd("C:/Users/reyha/Desktop/IDS Project")
+gas <- read.csv("merged_data.csv")
+# Bar plot of CO2 emissions by Economic Sector
+ggplot(gas, aes(x = Economic.Sector, fill = Economic.Sector)) +
+  geom_bar() +
+  labs(title = "Figure 4: CO2 Emissions by Economic Sector", x = "Economic Sector", y = "CO2 Emissions") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+```
+
+Figure 4 visually presents carbon dioxide emissions across different economic sectors.
+The industry sector notably stands out for its highest CO2 emissions, with the teal bar reaching nearly 6000 on the y-axis.
+Following closely, the transportation sector also significantly contributes to CO2 emissions.
+Buildings, electricity, and waste sectors exhibit comparatively lower emissions.
+
+Overall, the graph emphasizes the importance of prioritizing emissions reduction efforts in the industry and transportation sectors.
+This underscores their significant impact on CO2 emissions, as highlighted in Figure 2, where CO2 is identified as the most prominent greenhouse gas.
+
+\newpage
+
+```{r}
+#setwd("C:/Users/reyha/Desktop/IDS Project")
+gas <- read.csv("merged_data.csv")
+library(dplyr)
+library(ggplot2)
+
+# Group the data by Category and calculate the total emissions
+category_emissions <- gas %>%
+  group_by(Category) %>%
+  summarise(Total_Emissions = sum(MT.CO2e.AR4.100.yr)) %>%
+  arrange(desc(Total_Emissions))
+
+# Create the bar plot
+ggplot(category_emissions, aes(x = reorder(Category, Total_Emissions), y = Total_Emissions)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  labs(title = "Figure 5: Overall CO2 Emissions by Category",
+       x = "Category",
+       y = "Total CO2 Emissions (MT.CO2e.AR4.100.yr)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_y_continuous(labels = scales::comma)
+```
+
+Figure 5 illustrates the total CO2 emissions from various economic sector categories in New York.
+Based on our dataset, economic sectors emit gases in different categories, including, Solid Waste Management, Minerals, Solvent Usage, Electronics Industry, Fugitive Emissions, Imported Electricity, and Solid Waste Emergency Events.
+Observing the graph, "Fuel Combustion" emerges as the category with the highest emissions, significantly contributing to New York’s overall CO2 output.
+
+This graph underscores the importance of addressing emissions from specific categories within economic sectors.
+By focusing efforts on the most significant categories, such as fuel consumption and imported fossil fuels, policymakers can effectively target areas for emissions reduction initiatives.
+An interesting observation is that the category "Land" has a negative value, likely indicating the Earth's absorption of some CO2 through natural processes such as plant growth.
+
+\newpage
+
+```{r}
+# Load necessary packages
+library(dplyr)
+library(ggplot2)
+
+# Set working directory and read data
+#setwd("C:/Users/reyha/Desktop/IDS Project")
+gas <- read.csv("merged_data.csv")
+
+# Aggregate emissions by Economic Sector and Year
+sector_emissions <- gas %>%
+  group_by(Economic.Sector, Year) %>%
+  summarize(Total_Emissions = sum(MT.CO2e.AR5.20.yr))
+
+# Plot
+ggplot(sector_emissions, aes(x = Year, y = Total_Emissions, color = Economic.Sector)) +
+  geom_line(size = 1) +  # Increased line size for better visibility
+  labs(title = "Figure 6: Greenhouse Gas Emissions Over Time",
+       x = "Year",
+       y = "Total Emissions (MT.CO2e.AR5.20.yr)",
+       color = "Economic Sector") +
+  theme_minimal()
+
+
+```
+
+Figure 6 illustrates trends in greenhouse gas emissions from 1990 to just over 2020.
+Monitoring these trends over time is essential for understanding emission patterns in economic sectors, and can helped us through our modeling process.
+As seen in the pie chart in Figure 1, Transportation and Buildings exhibit the highest levels of greenhouse gas emissions over time.
+Notably, the "Electricity" sector demonstrates a significant decrease in emissions over time.
+
+An interesting observation from this plot is that most sectors show a downward trend as we approach 2019.
+However, there is a spike in emissions from the Building and Transportation sectors, which could be attributed to the time of COVID-19 pandemic.
+
+\newpage
+
+**Temprature Vs Gas Emissions:**
+
+As we discovered through our analysis and visualization, CO2 is the most significant greenhouse gas among others.
+Now, we inspect our second and third question: How do variations in greenhouse gas emissions correlate with observed changes in temperature, likely causing extreme weather events in NY?
+
+To find out, we need to analyze and determine the potential correlation between average temperature and the most significant gas, CO2, emissions.
+
+It's worth mentioning that we initially attempted to develop a statistical model encompassing all greenhouse gases. However, this approach proved impractical, yielding results that didn't contribute to our objectives. So, we pivoted our methodology to focus solely on the most significant gas, CO2, employing **ARIMA modeling**. The detailed information on the ARIMA modeling that was also used for the Greenhouse Emissions Model can be found in the accompanying Rmd file for reference.
+
+
+
+```{r echo=FALSE}
+#Green House Emissions Model:
+# Load necessary libraries
+library(tidyverse)
+#setwd("C:/Users/reyha/Desktop/IDS Project")
+# Load data
+gas <- read.csv("merged_data.csv")
+
+# Check the structure of the data
+#str(gas)
+
+```
+
+```{r echo=FALSE}
+# Convert 'Year' to a factor
+gas$Year <- as.factor(gas$Year)
+
+# Aggregate emissions by economic sector and year
+gas_aggregated <- gas %>%
+  group_by(Economic.Sector, Year) %>%
+  summarise(Total_gas = sum(MT.CO2e.AR5.20.yr)) %>%
+  ungroup()
+
+# Check the structure of the aggregated data
+#str(gas_aggregated)
+
+```
+
+```{r echo=FALSE}
+# Convert 'Year' to a factor
+gas$Year <- as.factor(gas$Year)
+
+# Aggregate emissions by economic sector and year
+gas_aggregated <- gas %>%
+  group_by(Economic.Sector, Year) %>%
+  summarise(Total_gas = sum(MT.CO2e.AR5.20.yr)) %>%
+  ungroup()
+
+# Check the structure of the aggregated data
+#str(gas_aggregated)
+
+```
+
+```{r time_series_model}
+# Fit time series models for each economic sector
+# (You may need to install the 'forecast' package if not already installed: install.packages("forecast"))
+library(forecast)
+models <- gas_aggregated %>%
+  group_by(Economic.Sector) %>%
+  summarise(model = list(auto.arima(Total_gas)))
+
+# Predict future emissions for each economic sector
+future_predictions <- models %>%
+  mutate(future_preds = map(model, ~ {
+    forecast_obj <- forecast::forecast(.x, h = 5)
+    data.frame(Point_Forecast = as.numeric(forecast_obj$mean),
+               Lower_PI = as.numeric(forecast_obj$lower),
+               Upper_PI = as.numeric(forecast_obj$upper))
+  })) %>%
+  unnest(cols = c(future_preds)) %>%
+  mutate(Point_Forecast = as.numeric(Point_Forecast),
+         Lower_PI = as.numeric(Lower_PI),
+         Upper_PI = as.numeric(Upper_PI))
+
+# View predictions
+#future_predictions
+
+
+```
+
+```{r}
+#setwd("C:/Users/reyha/Desktop/IDS Project")
+gas <- read.csv("merged_data.csv")
+
+library(ggplot2)
+ggplot(gas, aes(x = Year, y = Average_Fahrenheit_Temperature)) +
+  geom_line(color = "blue") +  # Change color if desired
+  labs(title = "Figure 7: Average Temperature in 1990-2023",
+       x = "Year",
+       y = "Average Temperature (\u00B0F)")
+
+```
+
+Figure 7 displays the average Fahrenheit temperature fluctuations over the years from 1990 to 2023.
+While there were noticeable ups and downs, there seems to be a slight consistent pattern of increase over time.
+
+```{r echo=FALSE}
+mergegas<-read.csv("/Users/spirisingula@unomaha.edu/Downloads/merged_data.csv")
+
+#head(mergegas)
+
+```
+
+```{r echo=FALSE}
+
+# Calculate correlation between temperature and CO2 emissions
+correlation <- cor(mergegas$Average_Fahrenheit_Temperature, mergegas$MT.CO2e.AR5.20.yr)
+
+# Print the correlation coefficient
+paste("Correlation between Average Temperature and CO2 Emissions:", correlation)
+```
+
+Our study explored the possible connection between mean temperature and CO2 emission.
+The correlation coefficient we obtained is (0.00145775) which is very close to zero.
+This indicates that there's practically no **Linear** relationship between average temperature and CO2 emissions in our data sets based on the chosen years.
+When the correlation coefficient is above 0, it indicates a positive correlation between two variables.
+Therefore we decided to do a Log transformation on the data to see if we can find a pattern as seen in the following figures.
+
+\newpage
+
+```{r}
+library(dplyr)
+library(knitr)
+
+# Group by year and find the maximum emission record for each year
+year_max_emissions <- mergegas %>%
+  group_by(Year) %>%
+  summarise(GasWithHighestEmission = Gas[which.max(MT.CO2e.AR5.20.yr)],
+            HighestEmissionValue = max(MT.CO2e.AR5.20.yr))
+
+# Print the table with year, gas, and highest emission
+kable(year_max_emissions, caption = "Table 2")
+
+```
+
+Table 2 shows information about the gas emissions for each year.
+Here's what found out: CO2 appears to be the dominant gas in terms of emissions for each year.
+
+\newpage
+
+```{r}
+library(ggplot2)
+ggplot(year_max_emissions, aes(Year,(HighestEmissionValue)),'') + geom_line() + 
+  geom_smooth(method=loess, se=FALSE)+labs(title = "Figure 8: Highest Gas Emission (CO2) by Year",
+       x = "Year",
+       y = "Highest Emission Value") +
+  theme_classic()
+```
+
+Figure 8 illustrates the average global CO2 emissions spanning from 1990 to 2023.The line plot showing trends in CO2 emissions over the years.
+It appears to be increasing in the begining and then decreasing overall, but there are fluctuations within that trend.According to plot,CO2 emissions appear to be highest around 2003 and lowest in 2020.
+As we can observe in this plot surprisingly, due to pandemic the CO2 gas emission had a downward trend and then spiked around the time of COVID-19 quarantine.
+
+However, it's essential to interpret this summary with caution, considering factors such as the regularity of year increments and the potential influence of outliers on the data.
+For a detailed examination of the dataset, we tried applying the log transformation on data from Figure 8.
+
+```{r}
+year_max_emissions_log <- year_max_emissions %>%
+  mutate(LogEmissionValue = log(HighestEmissionValue))
+
+# Create the line plot with log-transformed emission values
+ggplot(year_max_emissions_log, aes(x = Year, y = LogEmissionValue)) +
+  geom_line() +  # Adjust color as desired
+  labs(title = "Figure 9:Log of Highest Gas Emission (CO2) Value by Year",
+       x = "Year",
+       y = "Log(Highest Emission Value)") +
+  theme_classic()
+```
+
+As we can Observe in Figure 9, after applying the Log transformation there does not seem to be a significant change, so we can assume This suggests the data is inherently linear, indicating simpler linear models are sufficient for analysis.
+
+The residual plot is added below in Figure 10.
+
+
+```{r}
+# Detrending the Data:
+library(modelr)
+library(ggplot2)
+library(dplyr)
+
+fit <- lm(HighestEmissionValue ~ Year, data = year_max_emissions)
+dDat <- year_max_emissions %>%
+  add_residuals(fit)
+
+ggplot(dDat, aes(Year, resid)) + 
+  geom_line() + 
+  geom_smooth(method = "loess", se = FALSE) +
+  ggtitle("Figure 10: Residual of CO2 emission by year")
+
+
+```
+
+```{r echo=FALSE}
+library(forecast)
+gasDat<-dDat$HighestEmissionValue
+GSeries <- ts(gasDat, frequency=12, start=c(2018,30))
+GModel <- auto.arima(GSeries)
+#summary(GModel)
+```
+
+```{r}
+#GSeries <- ts(gasDat, frequency=25, start=c(2020,12))
+#mDat <- dDat[,c(2,1,1)] %>% melt(id="Year")
+plot(forecast(GModel), main = "Figure 11: ARIMA Forecast of CO2 Emissions")
+```
+**Forecast Results:**
+
+The forecast plot in Figure 11 describes A statistical method used for forecasting time series data from 2020 to 2025.The solid blue line represents the forecast value of CO2 in the next year (the dataset  includes data from 1990-2020 but this project was conducted in 2024). 
+Shaded Area,around the blue line represents the 95% confidence interval. This indicates the range of values within which the actual future values are likely to fall with 95% probability.
+As we can observe the CO2 levels are decreasing overtime.
+
+\newpage
+
+
+**Average Temperature 1990-2023 Time series Model:**
+
+
+
+ontext:The forecast plot depicts the predicted future values for the time series beyond the observed data range.The shaded area around the forecast line represents the 95% confidence interval, indicating the range within which actual future values are likely to fall with 95% probability.The ARIMA(2,1,1)(1,0,0)[20] model appears to be a reasonable fit for the time series data based on the Data set.
+
+```{r echo=FALSE}
+degree1<-read.csv("/Users/spirisingula@unomaha.edu/Downloads/Average_Temperature_1900-2023.csv")
+#str(degree1)
+#head(degree1)
+```
+
+```{r}
+#Detrending the Data:
+library(ggplot2)
+library(modelr)
+fit <- lm(Average_Fahrenheit_Temperature~Year, data=degree1)
+dDat <- degree1 %>%
+  add_residuals(fit)
+ggplot(dDat, aes(Year, resid)) + geom_line() + 
+  geom_smooth(method=loess, se=FALSE) + 
+ ggtitle("Figure 12: Residual of Average Fahrenheit Temperature")
+```
+
+The residual plot for Average Temperature from 1990 to 2023 illustrates the detrended data for Average Fahrenheit Temperature over the years. The smoother curve overlaid on the plot, generated using the "loess" method, visually represents the underlying patterns in the detrended data. It's evident that temperatures decreased from the 1990s to the 1960s, followed by an increase from the 1960s to the present year. According to NASA, temperatures on Earth have been rising since the Industrial Revolution. While natural variability plays a role, the majority of evidence suggests that human activities—especially emissions of heat-trapping greenhouse gases—are primarily responsible for the planet's warming trend.
+
+
+```{r}
+#decomposition
+
+temperature<-dDat$Average_Fahrenheit_Temperature
+tSeries <- ts(temperature, frequency=20, start=c(2003,300))
+dcomposedDat <- decompose(tSeries)
+plot(dcomposedDat)
+mtext("Figure 13:", side = 3, line = 2, adj = 0)
+
+```
+
+Figure 13 features four stacked line graphs, each representing a different part of the time series decomposition: "observed," "trend," "seasonal," and "random." The x-axis spans from 2018 to 2024, offering a better understanding of the temperature trend in recent years. Key highlights include fluctuating data in the "observed" graph with a slight upward trend, a smooth upward line in the "trend" graph, a repeating pattern in the "seasonal" graph indicating seasonal fluctuations, and irregular fluctuations in the "random" graph representing random variations. 
+As we can observe, the trend in temperature over time is rising.
+
+
+```{r echo=FALSE}
+#FITTING MODEL/ ARIMA
+library(forecast)
+tModel <- auto.arima(tSeries)
+#summary(tModel)
+```
+
+```{r}
+
+plot(forecast(tModel), main = "Figure 14: ARIMA Forecast of Average Temperature(F)")
+```
+
+The prediction chart shows the expected temperature patterns for the next few years, with the horizontal axis showing time, extending from the 2024 to a 2026 , and the vertical axis denoting the expected temperature (in degrees Fahrenheit).
+The predicted outlook indicates a slow rise in temperature in the upcoming years, as interpreted from the details, with the blue line showing a gradual upward slope.
+As we can Observe from this model the temperature is rising overall.
+\newpage
+
+**Dashboard:**
+
+Approach Overview:
+We developed an interactive Shiny dashboard using R, allowing users to explore data efficiently.
+
+Dashboard Design and Functionality:
+The user-friendly dashboard features intuitive navigation and diverse visual representations for effective data exploration.
+
+Case Study: Investigating NY Greenhouse Gas Emissions:
+Users analyze emissions from different sectors and gases, identifying significant sources and temporal trends.
+
+Temporal Trends and Climate Variables:
+Users visualize temporal trends in gas emissions and explore their relationship with climate variables.
+Additional Case Study:
+We can explore different facets of gas emissions or related datasets to demonstrate dashboard adaptability.
+
+
+
+\newpage
+**Findings and discussions:**
+
+
+Now, let's  review the analysis and address the research question:
+
+**1-What are the primary economic sectors responsible for greenhouse gas emissions in New York, and how have these emissions changed over time?**
+As depicted in Figure 1, the Economic Sectors in New York and their respective shares of emissions are as follows: Industry, holding the largest share, accounts for 36% of total emissions. This substantial contribution primarily arises from methane emissions originating from large factories, emphasizing the industrial sector's significant environmental impact. Following closely behind, transportation comprises 25% of emissions, primarily attributed to CO2 emissions resulting from fossil fuel combustion, as expected in New York. Additionally, the electricity sector represents 13% of emissions, reflecting energy consumption patterns in the state. Agriculture and waste sectors contribute 1% and 6% respectively.
+
+Figure 6 reveals that greenhouse gas emissions by each economic sector follow a consistent pattern over time, with some exceptions: Transportation and Buildings consistently exhibit the highest levels of greenhouse gas emissions. Notably, the "Electricity" sector demonstrates a significant decrease in emissions over time.
+
+An intriguing observation from this plot is that most sectors show a downward trend as we approach 2019. However, there is a spike in emissions from the Building and Transportation sectors, potentially attributable to the COVID-19 pandemic.
+
+**2-How do variations in greenhouse gas emissions correlate with observed changes in temperature likely causing extreme weather events in NY?**
+
+From our examination of Figures 2 and 3, it's clear that CO2 stands out as the most significant greenhouse gas. However, our analysis and statistical modeling on the combined dataset indicates no significant correlation between the **Overall** CO2 emissions and the average temperature. When comparing the CO2 emissions model from 1990 to 2023 with the Average Temperature over the same period, we can't conclusively say that CO2 affects temperature without further analysis and  including more contributing variables and factors.
+It is worth mentioning that in some time periods like recent years the two even seem to have a negative correlation Compare Figures: 7, 8,12,13. 
+
+**3-Which greenhouse gases are the most significant or have the highest emission levels?**
+The most prominent emissions come from CO2 (carbon dioxide) with CH4 (methane) following , while other gases
+such as HFCs (hydrofluorocarbons) and N20 (nitrous oxide) also contribute. Biogenic CO2, NF3 (nitrogen
+trifluoride), PFCs (perfluorocarbons), and SF6 (sulfur hexafluoride) have negligible or zero emissions. This observation is clear in Figure 2 and 3.
+
+**Interesting Findings:**
+
+It was certainly intriguing to uncover insights from our analysis regarding the spikes and dips in trends around 2019-2020, coinciding with the onset of the COVID-19 pandemic, which took the world by storm, pun intended!
+Almost all figures showed this fact, but to name a few: Figures:6, 7, 9 
+
+**Challenges and limitation:**
+ 
+As previously stated, our initial endeavor involved creating a statistical model that included all greenhouse gases. However, this method turned out to be impractical and didn't align with our objectives. Therefore, we adjusted our approach to concentrate solely on the most important gas, CO2, utilizing statistical analysis and ARIMA modeling.
+
+
+
+**Conclusion and Future Work:**
+
+This study aimed to investigate the relationship between greenhouse gas emissions and temperature variations in New York City over three decades. Initial findings suggested a correlation between local emissions and temperature fluctuations, underscoring the emissions' impact on the region's climate. However, the overall comparison between the trend of the most significant greenhouse gas, CO2, and the average temperature in New York, revealed no consistent pattern (although some periods showed negative correlation).
+In this analysis, we tackled data preparation, utilized ARIMA modeling for forecasting, and crafted a Shiny dashboard.
+
+For future research, we intend to delve deeper into the correlation between temperature variations and not only CO2 but also other greenhouse gas emissions. We plan to employ advanced modeling techniques to enhance prediction accuracy. Additionally, we aim to identify and observe other contributing factors. Collaboration with policymakers, scientists, and community stakeholders will be crucial for implementing effective strategies to combat climate change.
+
+In conclusion, while this project focused on a fraction of the contributing factors to greenhouse gas emissions, the initial findings underscore the importance of addressing local emissions and understanding their impact on temperature fluctuations in urban settings like NYC. Our goal is to contribute to the growing body of knowledge and inspire future research in this critical field, fostering ongoing collaboration for a more sustainable future.
+
+
+
+
+
+
+
+```{=tex}
+\begin{thebibliography}{9}
+
+\bibitem{R-base}
+ \emph{Statewide Greenhouse Gas Emissions Beginning 1990}, 
+  \url{https://catalog.data.gov/dataset/statewide-greenhouse-gas-emissions-beginning-1990}
+
+\bibitem{R-knitr}
+  \emph{Average Temperature from 1900 to 2023}, Kaggle,  
+  \url{https://www.kaggle.com/datasets/giabchnguyn/average-temperature-from-1900-to-2023}
+  
+  \bibitem{R-knitr}
+  \emph{Temperature anomolies from 1990 to 2023}, National Oceanic and Atmospheric Administration (NOAA),  
+  \url{https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/global/time-series/globe/land/ytd/0/1990-2023?trend=true&trend_base=10&begtrendyear=1850&endtrendyear=2024&filter=true&filterType=binomial}
+  
+  \bibitem{R-knitr}
+  \emph{World of Change: Global Temperatures},  
+  \url{https://earthobservatory.nasa.gov/world-of-change/global-temperatures#:~:text=Air%20temperatures%20on%20Earth%20have,for%20making%20our%20planet%20warmer.}
+  
+  
+
+\end{thebibliography}
+```
